@@ -4,7 +4,7 @@ datos <- read.csv("train.csv", header = TRUE, encoding = "UTF-8")
 
 View(datos$MiscVal)
 
-Summary(datos)
+summary(datos)
 
 View(datos)
 
@@ -31,3 +31,17 @@ for (k in k_values) {
 
 plot(k_values, iner, type = "b", main = "Método del Codo", xlab = "Número de Clústeres (k)", ylab = "Inercia")
 abline(v = which.min(diff(iner) > 10) + 1, col = "red", lty = 2)
+
+#Al obtener la cantidad de clusters, realizamos K-Means para encontrar los grupos.
+
+set.seed(123)
+num_clusters <- 2  # Número de clústeres determinado anteriormente
+
+# Aplicar el algoritmo de k-means
+kmeans_model <- kmeans(normalized_data, centers = num_clusters)
+
+# Añadir las etiquetas de clúster al conjunto de datos
+normalized_data$kmeans_cluster <- as.factor(kmeans_model$cluster)
+
+# Visualizar el resultado del clustering
+table(normalized_data$kmeans_cluster)

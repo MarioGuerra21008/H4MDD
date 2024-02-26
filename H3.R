@@ -83,3 +83,8 @@ ggplot(data = train, mapping = aes(x = OverallQual, y = SalePrice)) +
   geom_smooth(method = "lm", se = TRUE, color = "blue") +
   labs(title = "Calidad Promedio del Material x Precio de Venta", x = "Calidad Promedio", y = "Precio de Venta") +
   theme_bw() + theme(plot.title = element_text(hjust = 0.5))
+
+#Modelo lineal múltiple para SalePrice.
+multiple_linear_model<-lm(SalePrice~.,data = train)
+
+summary(multiple_linear_model)

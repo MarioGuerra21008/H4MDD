@@ -45,3 +45,41 @@ normalized_data$kmeans_cluster <- as.factor(kmeans_model$cluster)
 
 # Visualizar el resultado del clustering
 table(normalized_data$kmeans_cluster)
+
+#
+# División de grupos train y test para modelos de regresión lineal
+#
+
+porcentaje <- 0.52 #Porcentaje con el que se calcularán los grupos de train y test.
+datos_cuantitativos<- datos_para_clustering
+corte <- sample(nrow(datos_cuantitativos),nrow(datos_cuantitativos)*porcentaje)
+train<-datos_cuantitativos[corte,] #Corte para el grupo entrenamiento
+test<-datos_cuantitativos[-corte,] #Corte para el grupo prueba
+
+head(train)
+head(test)
+
+#Creación del modelo de regresión lineal.
+single_linear_model<- lm(SalePrice~OverallQual, data = train) #Modelo lineal singular para SalePrice y OverallQual
+summary(single_linear_model)
+
+#Análisis de residuos
+
+head(single_linear_model$residuals)
+
+boxplot(single_linear_model$residuals)
+
+# Análisis de predicción en conjunto prueba.
+
+predSLM<-predict(single_linear_model, newdata = test)
+head(predSLM)
+length(predSLM)
+
+# Gráfico del Modelo de Regresión Lineal Simple
+
+library(ggplot2)
+ggplot(data = train, mapping = aes(x = OverallQual, y = SalePrice)) +
+  geom_point(color = "lightgreen", size = 2) +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Calidad Promedio del Material x Precio de Venta", x = "Calidad Promedio", y = "Precio de Venta") +
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5))

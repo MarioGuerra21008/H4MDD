@@ -95,3 +95,6 @@ summary(multiple_linear_model)
 
 var_independients <- train[, -which(names(train) == "SalePrice")]
 
+correlation_matrix <- cor(var_independients)
+
+print(correlation_matrix)

@@ -10,7 +10,7 @@ View(datos)
 
 datos_para_clustering <- datos[, c("LotFrontage", "LotArea", "OverallQual", "OverallCond", "YearBuilt",
                                    "YearRemodAdd", "TotalBsmtSF", "BsmtFullBath", "BsmtHalfBath", "FullBath", "HalfBath",
-                                    "TotRmsAbvGrd", "Fireplaces", "GarageYrBlt", "GarageCars", "GarageArea",
+                                   "TotRmsAbvGrd", "Fireplaces", "GarageYrBlt", "GarageCars", "GarageArea",
                                    "PoolArea", "MiscVal", "MoSold", "YrSold", "SalePrice")]
 
 datos_para_clustering <- na.omit(datos_para_clustering) 
@@ -84,7 +84,14 @@ ggplot(data = train, mapping = aes(x = OverallQual, y = SalePrice)) +
   labs(title = "Calidad Promedio del Material x Precio de Venta", x = "Calidad Promedio", y = "Precio de Venta") +
   theme_bw() + theme(plot.title = element_text(hjust = 0.5))
 
+
 #Modelo lineal múltiple para SalePrice.
 multiple_linear_model<-lm(SalePrice~.,data = train)
 
 summary(multiple_linear_model)
+
+
+# Analisis de la correlacción
+
+var_independients <- train[, -which(names(train) == "SalePrice")]
+

@@ -98,3 +98,44 @@ var_independients <- train[, -which(names(train) == "SalePrice")]
 correlation_matrix <- cor(var_independients)
 
 print(correlation_matrix)
+
+
+
+
+#Creación del modelo de regresión lineal con el conjunto prueba.
+single_linear_model<- lm(SalePrice~OverallQual, data = test) #Modelo lineal singular para SalePrice y OverallQual
+summary(single_linear_model)
+
+
+#Análisis de residuos
+
+head(single_linear_model$residuals)
+
+boxplot(single_linear_model$residuals)
+
+
+# Gráfico del Modelo de Regresión Lineal Simple con el conjunto prueba.
+
+library(ggplot2)
+ggplot(data = test, mapping = aes(x = OverallQual, y = SalePrice)) +
+  geom_point(color = "lightgreen", size = 2) +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Calidad Promedio del Material x Precio de Venta", x = "Calidad Promedio", y = "Precio de Venta") +
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
+
+
+
+#Modelo lineal múltiple para SalePrice con el conjunto prueba.
+multiple_linear_model<-lm(SalePrice~.,data = test)
+
+summary(multiple_linear_model)
+
+
+# Analisis de la correlacción
+
+var_independients <- train[, -which(names(test) == "SalePrice")]
+
+correlation_matrix <- cor(var_independients)
+
+print(correlation_matrix)
+

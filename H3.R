@@ -166,3 +166,21 @@ ggplot(data = test, aes(x = predictions, y = residuals)) +
 # Gráfico de Importancia de Variables
 importance_plot <- barplot(abs(coef(multiple_linear_model)), names.arg = names(coef(multiple_linear_model)), col = "lightblue", main = "Importancia de Variables")
 
+
+
+# Predicciones de los modelos
+predicciones_simple <- predict(single_linear_model, newdata = test)
+predicciones_multiple <- predict(multiple_linear_model, newdata = test)
+
+# Crear un dataframe con las predicciones y los valores reales
+resultados <- data.frame(Actual = test$SalePrice, Simple = predicciones_simple, Multiple = predicciones_multiple)
+
+# Gráfico de dispersión para comparar modelos
+library(ggplot2)
+ggplot(resultados, aes(x = Actual)) +
+  geom_point(aes(y = Simple), color = "lightblue", size = 2, alpha = 0.7, shape = 1) +
+  geom_point(aes(y = Multiple), color = "orange", size = 2, alpha = 0.7, shape = 2) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+  labs(title = "Comparación de Modelos de Regresión",
+       x = "Valores Reales", y = "Predicciones") +
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5))

@@ -139,3 +139,30 @@ correlation_matrix <- cor(var_independients)
 
 print(correlation_matrix)
 
+
+# Gráfico de Predicciones vs. Valores Reales
+library(ggplot2)
+
+predictions <- predict(multiple_linear_model, newdata = test)
+
+ggplot(data = test, aes(x = SalePrice, y = predictions)) +
+  geom_point(color = "blue", size = 2) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+  labs(title = "Predicciones vs. Valores Reales", x = "Valores Reales", y = "Predicciones") +
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
+
+
+
+# Gráfico de Residuos
+residuals <- multiple_linear_model$residuals
+
+ggplot(data = test, aes(x = predictions, y = residuals)) +
+  geom_point(color = "green", size = 2) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Gráfico de Residuos", x = "Predicciones", y = "Residuos") +
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
+
+
+# Gráfico de Importancia de Variables
+importance_plot <- barplot(abs(coef(multiple_linear_model)), names.arg = names(coef(multiple_linear_model)), col = "lightblue", main = "Importancia de Variables")
+

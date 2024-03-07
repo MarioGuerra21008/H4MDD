@@ -15,6 +15,13 @@ datos_para_clustering <- datos[, c("LotFrontage", "LotArea", "OverallQual", "Ove
 
 datos_para_clustering <- na.omit(datos_para_clustering) 
 
+
+
+
+
+
+
+
 normalized_data <- scale(datos_para_clustering)
 
 View(normalized_data)
@@ -102,85 +109,26 @@ print(correlation_matrix)
 
 
 
-#Creación del modelo de regresión lineal con el conjunto prueba.
-single_linear_model<- lm(SalePrice~OverallQual, data = test) #Modelo lineal singular para SalePrice y OverallQual
-summary(single_linear_model)
-
-
-#Análisis de residuos
-
-head(single_linear_model$residuals)
-
-boxplot(single_linear_model$residuals)
-
-
-# Gráfico del Modelo de Regresión Lineal Simple con el conjunto prueba.
-
-library(ggplot2)
-ggplot(data = test, mapping = aes(x = OverallQual, y = SalePrice)) +
-  geom_point(color = "lightgreen", size = 2) +
-  geom_smooth(method = "lm", se = TRUE, color = "blue") +
-  labs(title = "Calidad Promedio del Material x Precio de Venta", x = "Calidad Promedio", y = "Precio de Venta") +
-  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
 
 
 
-#Modelo lineal múltiple para SalePrice con el conjunto prueba.
-multiple_linear_model<-lm(SalePrice~.,data = test)
+#HOJA DE TRABAJO 4
 
-summary(multiple_linear_model)
-
-
-# Analisis de la correlacción
-
-var_independients <- train[, -which(names(test) == "SalePrice")]
-
-correlation_matrix <- cor(var_independients)
-
-print(correlation_matrix)
+data_tree <- datos_para_clustering
 
 
-# Gráfico de Predicciones vs. Valores Reales
-library(ggplot2)
+summary(data_tree)
+library(rpart)
 
-predictions <- predict(multiple_linear_model, newdata = test)
+#Instalar paquetes con rplot
+install.packages("rpart.plot")
+library(rpart.plot)
 
-ggplot(data = test, aes(x = SalePrice, y = predictions)) +
-  geom_point(color = "blue", size = 2) +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
-  labs(title = "Predicciones vs. Valores Reales", x = "Valores Reales", y = "Predicciones") +
-  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
+#Crear nuestro modelo_arbol
+modelo_arbol <- rpart(SalePrice ~ ., data = data_tree)
 
+summary(modelo_arbol)
+plot(modelo_arbol)
 
-
-# Gráfico de Residuos
-residuals <- multiple_linear_model$residuals
-
-ggplot(data = test, aes(x = predictions, y = residuals)) +
-  geom_point(color = "green", size = 2) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  labs(title = "Gráfico de Residuos", x = "Predicciones", y = "Residuos") +
-  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
-
-
-# Gráfico de Importancia de Variables
-importance_plot <- barplot(abs(coef(multiple_linear_model)), names.arg = names(coef(multiple_linear_model)), col = "lightblue", main = "Importancia de Variables")
-
-
-
-# Predicciones de los modelos
-predicciones_simple <- predict(single_linear_model, newdata = test)
-predicciones_multiple <- predict(multiple_linear_model, newdata = test)
-
-# Crear un dataframe con las predicciones y los valores reales
-resultados <- data.frame(Actual = test$SalePrice, Simple = predicciones_simple, Multiple = predicciones_multiple)
-
-# Gráfico de dispersión para comparar modelos
-library(ggplot2)
-ggplot(resultados, aes(x = Actual)) +
-  geom_point(aes(y = Simple), color = "lightblue", size = 2, alpha = 0.7, shape = 1) +
-  geom_point(aes(y = Multiple), color = "orange", size = 2, alpha = 0.7, shape = 2) +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
-  labs(title = "Comparación de Modelos de Regresión",
-       x = "Valores Reales", y = "Predicciones") +
-  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
+#Mostrar el arbol con la data de SalePrice
+rpart.plot(modelo_arbol, digits = 3, fallen.leaves = TRUE)

@@ -185,4 +185,27 @@ View(datos)
 num_casas <- table(datos$Clasificacion)
 print(num_casas)
 
+#Añadir Clasificacion a los conjuntos train y test.
+
+trainRowsNumber<-sample(1:nrow(datos),porcentaje4*nrow(datos))
+train<-datos[trainRowsNumber,]
+test<-datos[-trainRowsNumber,]
+
+# Inciso 7 - Creación del árbol
+
+# Crear modelo de árbol de clasificación
+
+modelo_arbol_clasificacion <- rpart(Clasificacion ~ . - SalePrice, data = datos, method = "class")
+# Visualizar el árbol
+rpart.plot(modelo_arbol_clasificacion, digits = 3, fallen.leaves = TRUE)
+
+# Inciso 8.
+# Predecir con el conjunto de prueba
+predicciones_clasificacion <- predict(modelo_arbol_clasificacion, newdata = test, type = "class")
+
+head(predicciones_clasificacion)
+
+# Calcular la precisión
+precision <- sum(predicciones_clasificacion == test$Clasificacion) / length(test$Clasificacion)
+print(paste("Precisión del árbol de clasificación:", precision))
 

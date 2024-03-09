@@ -156,3 +156,17 @@ print(paste("Error Cuadrático Medio (MSE):", mse))
 r_cuadrado <- 1 - mse / var(test$SalePrice)
 print(paste("Coeficiente de Determinación (R^2):", r_cuadrado))
 
+#Añadir 3 modelos más:
+
+# Crear una lista de modelos con diferentes profundidades
+modelos <- list()
+for (depth in 1:3) {
+  modelos[[depth]] <- rpart(SalePrice~., data = data_tree, control = rpart.control(maxdepth = depth))
+}
+# Evaluar los modelos
+for (i in 1:length(modelos)) {
+  predicciones <- predict(modelos[[i]], newdata = test)
+  mse <- mean((test$SalePrice - predicciones)^2)
+  correlacion <- cor(test$SalePrice, predicciones)
+  print(paste("Profundidad:", i, "MSE:", mse, "Coeficiente de correlación:", correlacion))
+}

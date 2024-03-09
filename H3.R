@@ -114,21 +114,45 @@ print(correlation_matrix)
 
 #HOJA DE TRABAJO 4
 
-data_tree <- datos_para_clustering
+# Cargar datos desde un archivo CSV
+datos <- read.csv("train.csv", header = TRUE, encoding = "UTF-8")
+datos <- datos[, -1]
 
+View(datos)
 
+porcentaje4 <- 0.70
+trainRowsNumber<-sample(1:nrow(datos),porcentaje4*nrow(datos))
+train<-datos[trainRowsNumber,]
+test<-datos[-trainRowsNumber,]
+
+data_tree <- datos
 summary(data_tree)
 library(rpart)
 
 #Instalar paquetes con rplot
-install.packages("rpart.plot")
+#install.packages("rpart.plot")
 library(rpart.plot)
 
 #Crear nuestro modelo_arbol
-modelo_arbol <- rpart(SalePrice ~ ., data = data_tree)
+modelo_arbol <- rpart(SalePrice~.,data=data_tree)
 
 summary(modelo_arbol)
-plot(modelo_arbol)
 
 #Mostrar el arbol con la data de SalePrice
 rpart.plot(modelo_arbol, digits = 3, fallen.leaves = TRUE)
+
+#Predicción y análisis del resultado.
+
+modelo_train <- rpart(SalePrice~.,data=train)
+rpart.plot(modelo_train, digits = 3, fallen.leaves = TRUE)
+
+prediccion <- predict(modelo_arbol, newdata = test)
+
+head(prediccion)
+
+mse <- mean((test$SalePrice - prediccion)^2)
+print(paste("Error Cuadrático Medio (MSE):", mse))
+
+r_cuadrado <- 1 - mse / var(test$SalePrice)
+print(paste("Coeficiente de Determinación (R^2):", r_cuadrado))
+

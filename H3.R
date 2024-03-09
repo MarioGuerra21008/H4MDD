@@ -170,3 +170,19 @@ for (i in 1:length(modelos)) {
   correlacion <- cor(test$SalePrice, predicciones)
   print(paste("Profundidad:", i, "MSE:", mse, "Coeficiente de correlación:", correlacion))
 }
+
+#Inciso 6. Clasificar las casas en Económicas, Intermedias y Caras.
+
+# Definir cuartiles
+cuartiles <- quantile(datos$SalePrice, probs = c(0.25, 0.5, 0.75))
+
+# Crear variable respuesta
+datos$Clasificacion <- cut(datos$SalePrice, breaks = c(0, cuartiles[2], cuartiles[3], max(datos$SalePrice)), labels = c("Económicas", "Intermedias", "Caras"))
+
+View(datos)
+
+# Contar el número de casas en cada categoría
+num_casas <- table(datos$Clasificacion)
+print(num_casas)
+
+

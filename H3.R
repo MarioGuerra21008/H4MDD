@@ -1,4 +1,3 @@
-
 # Cargar datos desde un archivo CSV
 datos <- read.csv("train.csv", header = TRUE, encoding = "UTF-8")
 
@@ -208,4 +207,34 @@ head(predicciones_clasificacion)
 # Calcular la precisión
 precision <- sum(predicciones_clasificacion == test$Clasificacion) / length(test$Clasificacion)
 print(paste("Precisión del árbol de clasificación:", precision))
+
+
+# Inciso 9
+# Analisis de eficiencia del algoritmo con matriz de confusión
+
+#install.packages("caret")
+library(caret)
+
+confusion_matrix <- confusionMatrix(predicciones_clasificacion, test$Clasificacion)
+print("Matriz de Confusión:")
+print(confusion_matrix)
+
+# Mostrar la precisión global y por clase
+print(paste("Precisión Global:", confusion_matrix$overall["Accuracy"]))
+
+# Mostrar la precisión global y por clase
+precision_global <- confusion_matrix$overall["Accuracy"]
+print(paste("Precisión Global:", ifelse(!is.na(precision_global), precision_global, "No disponible")))
+print("Precisión por Clase:")
+balanced_accuracy <- confusion_matrix$byClass["Balanced Accuracy"]
+print(paste("Precisión Balanceada:", ifelse(!is.na(balanced_accuracy), balanced_accuracy, "No disponible")))
+
+# Mostrar errores más comunes
+sensibilidad <- confusion_matrix$byClass["Sens"]
+print("Sensibilidad (Errores más comunes):")
+print(ifelse(!is.na(sensibilidad), sensibilidad, "No disponible"))
+especificidad <- confusion_matrix$byClass["Spec"]
+print("Especificidad (Errores menos comunes):")
+print(ifelse(!is.na(especificidad), especificidad, "No disponible"))
+
 

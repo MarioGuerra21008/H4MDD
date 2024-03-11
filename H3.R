@@ -238,3 +238,37 @@ print("Especificidad (Errores menos comunes):")
 print(ifelse(!is.na(especificidad), especificidad, "No disponible"))
 
 
+# Inciso 10
+# Entrenar modelo con validación cruzada
+
+
+# Definir el control de la validación cruzada
+ctrl <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
+
+
+datos_imputados <- datos
+for (col in colnames(datos)) {
+  if (any(is.na(datos[[col]]))) {
+    datos_imputados[[col]][is.na(datos[[col]])] <- mean(datos[[col]], na.rm = TRUE)
+  }
+}
+
+print("Valores faltantes después de la imputación:")
+print(colSums(is.na(datos_imputados)))
+
+datos_imputados <- datos_imputados[, colSums(is.na(datos_imputados)) == 0]
+
+
+# Entrenar el modelo con validación cruzada
+modelo_cruzado <- train(Clasificacion ~ . - SalePrice, data = datos_imputados, method = "rpart", trControl = ctrl)
+
+# Mostrar el resumen del modelo cruzado
+print(modelo_cruzado)
+
+# Realizar predicciones con el modelo cruzado en el conjunto de prueba
+predicciones_cruzadas <- predict(modelo_cruzado, newdata = test)
+
+# Calcular la precisión con el modelo cruzado
+precision_cruzada <- sum(predicciones_cruzadas == test$Clasificacion) / length(test$Clasificacion)
+print(paste("Precisión con validación cruzada:", precision_cruzada))
+

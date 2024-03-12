@@ -275,46 +275,52 @@ print(paste("Precisión con validación cruzada:", precision_cruzada))
 
 
 # Inciso 11
-# Añadir 3 modelos más con diferentes profundidades
-for (depth in c(4, 8, 12)) {
-  modelo <- rpart(SalePrice ~ ., data = data_tree, control = rpart.control(maxdepth = depth))
-  predicciones <- predict(modelo, newdata = test)
-  mse <- mean((test$SalePrice - predicciones)^2)
-  correlacion <- cor(test$SalePrice, predicciones)
-  print(paste("Profundidad:", depth, "MSE:", mse, "Coeficiente de correlación:", correlacion))
+# Añadir 3 modelos más con diferentes profundidades al árbol de clasificación
+for (depth in c(4,8,12)) {
+  modelo <- rpart(Clasificacion ~ . - SalePrice, data = datos, method = "class", control = rpart.control(maxdepth = depth))
+  # Visualizar el árbol
+  rpart.plot(modelo, digits = depth, fallen.leaves = TRUE)
+  
+  # Realizar predicciones con el conjunto de prueba
+  predicciones_clasificacion <- predict(modelo, newdata = test, type = "class")
+  
+  # Calcular la precisión
+  precision <- sum(predicciones_clasificacion == test$Clasificacion) / length(test$Clasificacion)
+  print(paste("Profundidad:", depth, "Precisión del árbol de clasificación:", precision))
 }
 
 
+
 # Inciso 12
-# Cargar el paquete randomForest
-#install.packages("randomForest")
+# Instalar y cargar el paquete randomForest
+# install.packages("randomForest")
 library(randomForest)
 
-# Crear un modelo Random Forest
-modelo_rf <- randomForest(SalePrice ~ ., data = train)
 
-# Realizar predicciones en el conjunto de prueba
-predicciones_rf <- predict(modelo_rf, newdata = test)
+datos_imputados <- datos
+for (col in colnames(datos)) {
+  if (any(is.na(datos[[col]]))) {
+    datos_imputados[[col]][is.na(datos[[col]])] <- mean(datos[[col]], na.rm = TRUE)
+  }
+}
 
-# Calcular la precisión
-precision_rf <- sum(predicciones_rf == test$Clasificacion) / length(test$Clasificacion)
-print(paste("Precisión del Random Forest:", precision_rf))
+print("Valores faltantes después de la imputación:")
+print(colSums(is.na(datos_imputados)))
 
-# Crear matriz de confusión
-confusion_matrix_rf <- confusionMatrix(predicciones_rf, test$Clasificacion)
+datos_imputados <- datos_imputados[, colSums(is.na(datos_imputados)) == 0]
+# Ajustar modelo Random Forest con datos imputados
+modelo_rf <- randomForest(Clasificacion ~ . - SalePrice, data = datos_imputados)
+print(modelo_rf)
 
-# Mostrar la matriz de confusión
-print("Matriz de Confusión (Random Forest):")
-print(confusion_matrix_rf)
+# Asegurar niveles de factor consistentes
+test$Clasificacion <- factor(test$Clasificacion, levels = levels(datos_imputados$Clasificacion))
 
-# Mostrar la precisión global y por clase
-print(paste("Precisión Global (Random Forest):", confusion_matrix_rf$overall["Accuracy"]))
-print("Precisión por Clase (Random Forest):")
-print(paste("Precisión Balanceada (Random Forest):", confusion_matrix_rf$byClass["Balanced Accuracy"]))
+# Realizar predicciones con el conjunto de prueba
+predicciones_rf <- predict(modelo_rf, newdata = test, type = "response")
 
-# Mostrar errores más comunes
-print("Sensibilidad (Errores más comunes) (Random Forest):")
-print(confusion_matrix_rf$byClass["Sens"])
-print("Especificidad (Errores menos comunes) (Random Forest):")
-print(confusion_matrix_rf$byClass["Spec"])
+# Calcular la precisión con el modelo Random Forest
+precision_rf <- sum(predicciones_rf == test$Clasificacion, na.rm = TRUE) / length(test$Clasificacion)
+print(paste("Precisión con Random Forest:", precision_rf))
+
+
 

@@ -272,3 +272,49 @@ predicciones_cruzadas <- predict(modelo_cruzado, newdata = test)
 precision_cruzada <- sum(predicciones_cruzadas == test$Clasificacion) / length(test$Clasificacion)
 print(paste("Precisión con validación cruzada:", precision_cruzada))
 
+
+
+# Inciso 11
+# Añadir 3 modelos más con diferentes profundidades
+for (depth in c(4, 8, 12)) {
+  modelo <- rpart(SalePrice ~ ., data = data_tree, control = rpart.control(maxdepth = depth))
+  predicciones <- predict(modelo, newdata = test)
+  mse <- mean((test$SalePrice - predicciones)^2)
+  correlacion <- cor(test$SalePrice, predicciones)
+  print(paste("Profundidad:", depth, "MSE:", mse, "Coeficiente de correlación:", correlacion))
+}
+
+
+# Inciso 12
+# Cargar el paquete randomForest
+#install.packages("randomForest")
+library(randomForest)
+
+# Crear un modelo Random Forest
+modelo_rf <- randomForest(SalePrice ~ ., data = train)
+
+# Realizar predicciones en el conjunto de prueba
+predicciones_rf <- predict(modelo_rf, newdata = test)
+
+# Calcular la precisión
+precision_rf <- sum(predicciones_rf == test$Clasificacion) / length(test$Clasificacion)
+print(paste("Precisión del Random Forest:", precision_rf))
+
+# Crear matriz de confusión
+confusion_matrix_rf <- confusionMatrix(predicciones_rf, test$Clasificacion)
+
+# Mostrar la matriz de confusión
+print("Matriz de Confusión (Random Forest):")
+print(confusion_matrix_rf)
+
+# Mostrar la precisión global y por clase
+print(paste("Precisión Global (Random Forest):", confusion_matrix_rf$overall["Accuracy"]))
+print("Precisión por Clase (Random Forest):")
+print(paste("Precisión Balanceada (Random Forest):", confusion_matrix_rf$byClass["Balanced Accuracy"]))
+
+# Mostrar errores más comunes
+print("Sensibilidad (Errores más comunes) (Random Forest):")
+print(confusion_matrix_rf$byClass["Sens"])
+print("Especificidad (Errores menos comunes) (Random Forest):")
+print(confusion_matrix_rf$byClass["Spec"])
+
